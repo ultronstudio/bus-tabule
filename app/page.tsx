@@ -83,7 +83,7 @@ export default function BoardPage() {
   return (
     <main className="board">
       <header className="header">
-        <h1>NOVÝ BYDŽOV</h1>
+        <h1>HRADEC KRÁLOVÉ</h1>
 
         <div className="clock-wrapper">
           {loading && <div className="spinner small"></div>}

@@ -4,7 +4,9 @@ import * as cheerio from 'cheerio'
 export async function GET() {
   try {
 
-    const url = "https://idos.cz/vlakyautobusymhdvse/odjezdy/vysledky/?f=Nov%C3%BD%20Byd%C5%BEov,,Termin%C3%A1l%20HD&fc=200003"
+    const stanice = "Hradec Králové, Terminál HD"
+
+    const url = `https://idos.cz/vlakyautobusymhdvse/odjezdy/vysledky/?f=${encodeURIComponent(stanice)}&fc=200003`
 
     const response = await fetch(url, {
       headers: {
@@ -67,7 +69,7 @@ export async function GET() {
     odjezdy.sort((a, b) => a.cas.localeCompare(b.cas))
 
     return NextResponse.json({
-      stanice: "Nový Bydžov, Terminál HD",
+      stanice: stanice,
       aktualizovano: new Date().toISOString(),
       pocet_spoju: odjezdy.length,
       data: odjezdy
