@@ -55,6 +55,8 @@ export default function BoardPage() {
 
     const interval = setInterval(fetchDepartures, 15000);
 
+    // initialize clock immediately instead of waiting one second
+    setTime(new Date().toLocaleTimeString("cs-CZ"));
     const clock = setInterval(() => {
       setTime(new Date().toLocaleTimeString("cs-CZ"));
     }, 1000);

@@ -2,18 +2,20 @@ body{
 background:black;
 color:white;
 font-family:system-ui;
-overflow:hidden;
-padding:0;
 margin:0;
+padding:0;
 }
 
+/* ===== TV MODE ===== */
+
 .board{
-height:100vh;
+min-height:100vh;
 display:flex;
 flex-direction:column;
-padding-left:40px;
-padding-right:40px;
+padding:40px;
 }
+
+/* HEADER */
 
 .header{
 display:flex;
@@ -21,12 +23,11 @@ justify-content:space-between;
 align-items:center;
 border-bottom:4px solid #FFD400;
 padding-bottom:10px;
-padding-top: 20px;
 }
 
 h1{
 font-size:64px;
-margin: 0;
+margin:0;
 color:#FFD400;
 font-weight:700;
 }
@@ -34,12 +35,15 @@ font-weight:700;
 .header p{
 font-size:28px;
 color:#aaa;
+margin:0;
 }
 
 .clock{
 font-size:48px;
 font-weight:700;
 }
+
+/* TABLE */
 
 .table{
 margin-top:40px;
@@ -74,6 +78,8 @@ text-align:right;
 font-weight:700;
 }
 
+/* QR */
+
 .qr{
 position:absolute;
 bottom:30px;
@@ -81,21 +87,77 @@ right:30px;
 width:160px;
 }
 
-@media (max-width: 768px) {
-  /* Adjust styles for smaller screens */
-  body {
-    font-size: 14px;
-    padding: 0 10px;
-  }
-  .container {
-    padding: 10px;
-    flex-direction: column;
-  }
-  h1 {
-    font-size: 24px;
-  }
-  p {
-    font-size: 12px;
-  }
-  /* Add more responsive styles as needed */
+/* ===== MOBILE MODE ===== */
+
+@media (max-width: 900px){
+
+body{
+overflow:auto;
+}
+
+.board{
+padding:16px;
+}
+
+/* header stack */
+
+.header{
+flex-direction:column;
+align-items:flex-start;
+gap:6px;
+}
+
+h1{
+font-size:28px;
+}
+
+.header p{
+font-size:16px;
+}
+
+.clock{
+font-size:18px;
+}
+
+/* table */
+
+.table{
+gap:10px;
+margin-top:20px;
+}
+
+.row{
+grid-template-columns:70px 1fr 60px 70px;
+font-size:18px;
+padding:10px 0;
+border-bottom:1px solid #222;
+}
+
+.head{
+font-size:12px;
+color:#888;
+}
+
+.line{
+font-size:18px;
+}
+
+.dir{
+font-size:16px;
+}
+
+.plat{
+font-size:16px;
+}
+
+.time{
+font-size:18px;
+}
+
+/* QR na mobilu nepotřebujeme */
+
+.qr{
+display:none;
+}
+
 }
