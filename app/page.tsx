@@ -86,8 +86,8 @@ export default function BoardPage() {
         <h1>NOVÝ BYDŽOV</h1>
 
         <div className="clock-wrapper">
-          <div className="clock">{time}</div>
           {loading && <div className="spinner small"></div>}
+          <div className="clock">{time}</div>
         </div>
       </header>
 
