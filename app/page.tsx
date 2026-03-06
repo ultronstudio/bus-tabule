@@ -13,41 +13,47 @@ type Departure = {
 export default function BoardPage() {
   const [departures, setDepartures] = useState<Departure[]>([]);
   const [time, setTime] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const fetchDepartures = async () => {
-    const res = await fetch("/api/odjezdy", { cache: "no-store" });
-    const json = await res.json();
+    setLoading(true);
+    try {
+      const res = await fetch("/api/odjezdy", { cache: "no-store" });
+      const json = await res.json();
 
-    const now = new Date();
+      const now = new Date();
 
-    const parsed = json.data
-      .map((d: any) => {
-        const cas = d.cas.split("\n")[0].trim();
+      const parsed = json.data
+        .map((d: any) => {
+          const cas = d.cas.split("\n")[0].trim();
 
-        const [h, m] = cas.split(":").map(Number);
+          const [h, m] = cas.split(":").map(Number);
 
-        const depTime = new Date();
-        depTime.setHours(h, m, 0, 0);
+          const depTime = new Date();
+          depTime.setHours(h, m, 0, 0);
 
-        // přechod dne
-        if (depTime < now) {
-          depTime.setDate(depTime.getDate() + 1);
-        }
+          // přechod dne
+          if (depTime < now) {
+            depTime.setDate(depTime.getDate() + 1);
+          }
 
-        return {
-          linka: d.linka,
-          kam: d.kam.replace(/,,/g, " "),
-          cas,
-          timeObj: depTime,
-          nastupiste: d.nastupiste,
-          zpozdeni: parseInt(d.zpozdeni) || 0,
-        };
-      })
+          return {
+            linka: d.linka,
+            kam: d.kam.replace(/,,/g, " "),
+            cas,
+            timeObj: depTime,
+            nastupiste: d.nastupiste,
+            zpozdeni: parseInt(d.zpozdeni) || 0,
+          };
+        })
 
-      .sort((a: any, b: any) => a.timeObj - b.timeObj)
-      .slice(0, 5);
+        .sort((a: any, b: any) => a.timeObj - b.timeObj)
+        .slice(0, 5);
 
-    setDepartures(parsed);
+      setDepartures(parsed);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -83,17 +89,23 @@ export default function BoardPage() {
           <div>ODJEZD</div>
         </div>
 
-        {departures.map((d, i) => (
-          <div key={i} className="row">
-            <div className="line">{d.linka}</div>
-
-            <div className="dir">{d.kam}</div>
-
-            <div className="plat">{d.nastupiste}</div>
-
-            <div className="time">{d.cas}</div>
+        {loading ? (
+          <div className="row loading">
+            <div colSpan={4} className="spinner"></div>
           </div>
-        ))}
+        ) : (
+          departures.map((d, i) => (
+            <div key={i} className="row">
+              <div className="line">{d.linka}</div>
+
+              <div className="dir">{d.kam}</div>
+
+              <div className="plat">{d.nastupiste}</div>
+
+              <div className="time">{d.cas}</div>
+            </div>
+          ))
+        )}
       </div>
 
       <img className="qr" src="/qr.png" alt="QR kód pro mobilní verzi" />
