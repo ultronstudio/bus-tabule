@@ -14,12 +14,16 @@ export default function BoardPage() {
   const [departures, setDepartures] = useState<Departure[]>([]);
   const [time, setTime] = useState("");
   const [loading, setLoading] = useState(false);
+  const [station, setStation] = useState<string>("");
 
   const fetchDepartures = async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/odjezdy", { cache: "no-store" });
       const json = await res.json();
+      if (json.stanice) {
+        setStation(json.stanice);
+      }
 
       const now = new Date();
 
@@ -73,6 +77,19 @@ export default function BoardPage() {
     };
   }, []);
 
+  if (loading) {
+    return (
+      <main className="board loading-overlay">
+        <div className="loading-content">
+          <div className="spinner"></div>
+          <div className="loading-text">
+            Načítám data pro "{station || "..."}"
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="board">
       <header className="header">
@@ -89,12 +106,7 @@ export default function BoardPage() {
           <div>ODJEZD</div>
         </div>
 
-        {loading ? (
-          <div className="row loading">
-            <div colSpan={4} className="spinner"></div>
-          </div>
-        ) : (
-          departures.map((d, i) => (
+          {departures.map((d, i) => (
             <div key={i} className="row">
               <div className="line">{d.linka}</div>
 
@@ -104,11 +116,10 @@ export default function BoardPage() {
 
               <div className="time">{d.cas}</div>
             </div>
-          ))
-        )}
+          ))}
       </div>
 
-      <img className="qr" src="/qr.png" alt="QR kód pro mobilní verzi" />
+      <img className="qr" src="/api/qr" alt="QR kód pro mobilní verzi" />
     </main>
   );
 }
