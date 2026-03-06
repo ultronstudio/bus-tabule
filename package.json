@@ -1,0 +1,43 @@
+{
+  "name": "novybydzov-departure-arrivals",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "lint:fix": "eslint --fix"
+  },
+  "keywords": [
+    "novybydzov",
+    "departure",
+    "arrivals",
+    "nextjs",
+    "react",
+    "bus",
+    "train",
+    "bus-station",
+    "train-station",
+    "transportation",
+    "schedules",
+    "real-time",
+    "public-transport",
+    "web-app",
+    "frontend",
+    "user-interface",
+    "travel",
+    "commuting",
+    "navigation"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "next": "^16.1.6",
+    "nodemon": "^3.1.14",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
+  }
+}
