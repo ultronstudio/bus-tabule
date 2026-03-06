@@ -36,9 +36,13 @@ export async function GET(request: Request) {
       // CÍL
       const kam = row.find("td").eq(0).find("h3").text().trim()
 
-      // LINKA
+      // LINKA – we only care about buses (not trolleybuses, trams, etc.)
       const linkaRaw = row.find(".code h3").text().trim()
-      const linka = linkaRaw.replace("Bus", "").trim()
+      if (!/bus/i.test(linkaRaw)) {
+        // skip anything that isn't explicitly marked as a bus
+        return
+      }
+      const linka = linkaRaw.replace(/Bus/i, "").trim()
 
       // ČAS
       const cas = row
