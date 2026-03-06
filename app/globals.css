@@ -185,6 +185,16 @@ font-size:16px;
   border-width: 3px;
 }
 
+/* message shown before any departures are available */
+.initial-loading {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(24px, 5vw, 48px);
+  color: #aaa;
+}
+
 .loading-content {
   text-align: center;
   color: white;

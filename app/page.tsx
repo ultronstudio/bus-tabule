@@ -91,13 +91,18 @@ export default function BoardPage() {
         </div>
       </header>
 
-      <div className="table">
-        <div className="row head">
-          <div>LINKA</div>
-          <div>SMĚR</div>
-          <div>NÁST.</div>
-          <div>ODJEZD</div>
+      {loading && departures.length === 0 ? (
+        <div className="initial-loading">
+          Načítám data…
         </div>
+      ) : (
+        <div className="table">
+          <div className="row head">
+            <div>LINKA</div>
+            <div>SMĚR</div>
+            <div>NÁST.</div>
+            <div>ODJEZD</div>
+          </div>
 
           {departures.map((d, i) => (
             <div key={i} className="row">
@@ -110,7 +115,8 @@ export default function BoardPage() {
               <div className="time">{d.cas}</div>
             </div>
           ))}
-      </div>
+        </div>
+      )}
 
       <img className="qr" src="/api/qr" alt="QR kód pro mobilní verzi" />
     </main>
