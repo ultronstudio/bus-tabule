@@ -65,8 +65,7 @@ export default function BoardPage() {
           };
         })
 
-        .sort((a: any, b: any) => a.timeObj - b.timeObj)
-        .slice(0, 5);
+        .sort((a: any, b: any) => a.timeObj - b.timeObj);
 
       setDepartures(parsed);
     } finally {
@@ -107,6 +106,9 @@ export default function BoardPage() {
     <main className="board">
       <header className="header">
         <h1>{station || "Odjezdy"}</h1>
+        {departures.length > 0 && (
+          <div className="count">{departures.length} spojů</div>
+        )}
 
         <div className="clock-wrapper">
           {loading && <div className="spinner small"></div>}

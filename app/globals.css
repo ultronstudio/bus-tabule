@@ -30,6 +30,12 @@ flex-wrap:wrap;
 gap:10px;
 }
 
+.count {
+  font-size: clamp(14px, 3vw, 24px);
+  color: #ccc;
+  margin-left: 10px;
+}
+
 h1{
 font-size:clamp(28px,5vw,64px);
 margin:0;
