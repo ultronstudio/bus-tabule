@@ -36,6 +36,11 @@ gap:10px;
   margin-left: 10px;
 }
 
+.subtitle {
+  font-size: clamp(14px, 3vw, 24px);
+  color: #bbb;
+}
+
 h1{
 font-size:clamp(28px,5vw,64px);
 margin:0;

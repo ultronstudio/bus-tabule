@@ -102,10 +102,15 @@ export default function BoardPage() {
     }
   }, []);
 
+  const subtitle = "pouze meziměstské";
+
   return (
     <main className="board">
       <header className="header">
-        <h1>{station || "Odjezdy"}</h1>
+        <div>
+          <h1>{station || "Odjezdy"}</h1>
+          <div className="subtitle">{subtitle}</div>
+        </div>
         {departures.length > 0 && (
           <div className="count">{departures.length} spojů</div>
         )}
@@ -119,6 +124,10 @@ export default function BoardPage() {
       {loading && departures.length === 0 ? (
         <div className="initial-loading">
           Načítám data…
+        </div>
+      ) : departures.length === 0 ? (
+        <div className="initial-loading">
+          Žádné meziměstské spoje k dispozici
         </div>
       ) : (
         <div className="table">
