@@ -77,25 +77,18 @@ export default function BoardPage() {
     };
   }, []);
 
-  if (loading) {
-    return (
-      <main className="board loading-overlay">
-        <div className="loading-content">
-          <div className="spinner"></div>
-          <div className="loading-text">
-            Načítám data pro "{station || "..."}"
-          </div>
-        </div>
-      </main>
-    );
-  }
+  // don't hide the whole page on load – just show a spinner near the clock
+  // (we leave the state logic in place because fetchDepartures sets loading)
 
   return (
     <main className="board">
       <header className="header">
         <h1>NOVÝ BYDŽOV</h1>
 
-        <div className="clock">{time}</div>
+        <div className="clock-wrapper">
+          <div className="clock">{time}</div>
+          {loading && <div className="spinner small"></div>}
+        </div>
       </header>
 
       <div className="table">
