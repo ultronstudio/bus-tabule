@@ -95,6 +95,34 @@ font-weight:700;
 white-space:nowrap;
 }
 
+/* search bar (station selector) */
+
+.search-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.search-bar input {
+  background: #111;
+  border: 1px solid #555;
+  color: white;
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: clamp(14px, 2vw, 20px);
+}
+
+.search-bar button {
+  background: #FFD400;
+  color: black;
+  border: none;
+  padding: 6px 12px;
+  font-size: clamp(14px, 2vw, 20px);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
 /* QR PANEL */
 
 .qr-box{

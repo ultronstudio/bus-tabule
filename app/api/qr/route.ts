@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server'
 import QRCode from 'qrcode'
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-
-    const url = "https://tabule.novybydzov.cz"
+    const { searchParams } = new URL(request.url)
+    const base = "https://tabule.novybydzov.cz"
+    const url = [...searchParams].length
+      ? `${base}?${searchParams.toString()}`
+      : base
 
     const qr = await QRCode.toBuffer(url, {
       errorCorrectionLevel: 'H',   // NEJVYŠŠÍ ochrana

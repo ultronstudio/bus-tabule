@@ -15,11 +15,20 @@ export default function BoardPage() {
   const [time, setTime] = useState("");
   const [loading, setLoading] = useState(true);
   const [station, setStation] = useState<string>("");
+  const [queryStation, setQueryStation] = useState<string>("");
+  const [queryFc, setQueryFc] = useState<string>("");
 
   const fetchDepartures = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/odjezdy", { cache: "no-store" });
+      // build query string for the backend
+      let url = "/api/odjezdy";
+      const params = new URLSearchParams();
+      if (queryStation) params.set("stanice", queryStation);
+      if (queryFc) params.set("fc", queryFc);
+      if ([...params].length) url += "?" + params.toString();
+
+      const res = await fetch(url, { cache: "no-store" });
       const json = await res.json();
       if (json.stanice) {
         setStation(json.stanice);
@@ -61,6 +70,15 @@ export default function BoardPage() {
   };
 
   useEffect(() => {
+    // initialise search parameters from URL if provided
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const s = params.get("stanice") || "";
+      const f = params.get("fc") || "";
+      setQueryStation(s);
+      setQueryFc(f);
+    }
+
     fetchDepartures();
 
     const interval = setInterval(fetchDepartures, 15000);
@@ -80,10 +98,46 @@ export default function BoardPage() {
   // don't hide the whole page on load – just show a spinner near the clock
   // (we leave the state logic in place because fetchDepartures sets loading)
 
+  const handleSearch = () => {
+    // update query string in URL without reloading
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams();
+      if (queryStation) params.set("stanice", queryStation);
+      if (queryFc) params.set("fc", queryFc);
+      const newUrl = `${window.location.pathname}?${params.toString()}`;
+      window.history.replaceState(null, "", newUrl);
+    }
+    fetchDepartures();
+  };
+
+  const [qrUrl, setQrUrl] = useState<string>("/api/qr");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setQrUrl("/api/qr" + window.location.search);
+    }
+  }, [queryStation, queryFc]);
+
   return (
     <main className="board">
       <header className="header">
-        <h1>HRADEC KRÁLOVÉ</h1>
+        <h1>{station || "Odjezdy"}</h1>
+        <div className="search-bar">
+          <input
+            type="text"
+            placeholder="stanice (město, zastávka)"
+            value={queryStation}
+            onChange={(e) => setQueryStation(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="fc kód (volitelné)"
+            value={queryFc}
+            onChange={(e) => setQueryFc(e.target.value)}
+            style={{ width: "6rem" }}
+          />
+          <button onClick={handleSearch}>Aktualizovat</button>
+        </div>
 
         <div className="clock-wrapper">
           {loading && <div className="spinner small"></div>}
@@ -118,7 +172,7 @@ export default function BoardPage() {
         </div>
       )}
 
-      <img className="qr" src="/api/qr" alt="QR kód pro mobilní verzi" />
+      <img className="qr" src={qrUrl} alt="QR kód pro mobilní verzi" />
     </main>
   );
 }

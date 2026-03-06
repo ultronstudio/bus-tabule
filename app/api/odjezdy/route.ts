@@ -1,12 +1,21 @@
 import { NextResponse } from 'next/server'
 import * as cheerio from 'cheerio'
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    // allow callers to override the search station (city + stop) and optional
+    // region code (fc) via query string, e.g.
+    //   /api/odjezdy?stanice=Praha+hl.n&fc=100000
+    // If nothing is provided we fall back to a known default so that the
+    // endpoint continues to return results for development.
+    const { searchParams } = new URL(request.url)
+    const stanice =
+      searchParams.get("stanice") || "Hradec Králové, Terminál HD"
+    const fc = searchParams.get("fc") // may be null
 
-    const stanice = "Hradec Králové, Terminál HD"
-
-    const url = `https://idos.cz/vlakyautobusymhdvse/odjezdy/vysledky/?f=${encodeURIComponent(stanice)}&fc=200003`
+    const url = `https://idos.cz/vlakyautobusymhdvse/odjezdy/vysledky/?f=${encodeURIComponent(
+      stanice
+    )}${fc ? `&fc=${encodeURIComponent(fc)}` : ""}`
 
     const response = await fetch(url, {
       headers: {
@@ -69,7 +78,8 @@ export async function GET() {
     odjezdy.sort((a, b) => a.cas.localeCompare(b.cas))
 
     return NextResponse.json({
-      stanice: stanice,
+      query: { stanice, ...(fc ? { fc } : {}) },
+      stanice,
       aktualizovano: new Date().toISOString(),
       pocet_spoju: odjezdy.length,
       data: odjezdy
