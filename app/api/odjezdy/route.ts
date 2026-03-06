@@ -67,13 +67,27 @@ export async function GET(request: Request) {
         ? zpozdeniRaw.replace(/[^\d]/g, "")
         : "0"
 
+      // carrier info lives in the second cell of the dep-row-second
+      const carrier = delayRow
+        .find('span[title="dopravce"]')
+        .text()
+        .trim()
+
+      // skip local city transit providers (MHD) – they usually have names like
+      // "Dopravní podnik města …". consider any carrier containing
+      // "Dopravní podnik města" or "městský" as local.
+      if (/Dopravní\s+podnik\s+města/i.test(carrier) || /měst/i.test(carrier)) {
+        return
+      }
+
       if (cas && kam) {
         odjezdy.push({
           linka,
           kam,
           cas,
           nastupiste,
-          zpozdeni: `${zpozdeni} min`
+          zpozdeni: `${zpozdeni} min`,
+          carrier,
         })
       }
 
