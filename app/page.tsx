@@ -13,7 +13,7 @@ type Departure = {
 export default function BoardPage() {
   const [departures, setDepartures] = useState<Departure[]>([]);
   const [time, setTime] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [station, setStation] = useState<string>("");
 
   const fetchDepartures = async () => {
