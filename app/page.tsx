@@ -65,7 +65,9 @@ export default function BoardPage() {
           };
         })
 
-        .sort((a: any, b: any) => a.timeObj - b.timeObj);
+        .sort((a: any, b: any) => a.timeObj - b.timeObj)
+        // only keep the next bus plus five after it
+        .slice(0, 6);
 
       setDepartures(parsed);
     } finally {
