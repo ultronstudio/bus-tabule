@@ -12,6 +12,7 @@ const PRESET_STOPS = [
 
 export default function HomePage() {
   const router = useRouter();
+  const currentYear = new Date().getFullYear();
 
   const navigateToStop = (stop: string) => {
     const targetStop = stop.trim();
@@ -23,30 +24,42 @@ export default function HomePage() {
 
   return (
     <main className="landing-page">
-      <section className="landing-card">
-        <p className="landing-kicker">Odjezdová tabule</p>
-        <h1>Vyberte zastávku</h1>
-        <p className="landing-description">
-          Vyberte jednu z připravených zastávek a pokračujte na informační tabuli.
-        </p>
+      <div className="landing-shell">
+        <section className="landing-card">
+          <p className="landing-kicker">Odjezdová tabule</p>
+          <h1>Vyberte zastávku</h1>
+          <p className="landing-description">
+            Vyberte jednu z připravených zastávek a pokračujte na informační tabuli.
+          </p>
 
-        <div className="quick-stops">
-          <p className="quick-stops-title">Rychlý výběr</p>
+          <div className="quick-stops">
+            <p className="quick-stops-title">Rychlý výběr</p>
 
-          <div className="quick-stops-grid">
-            {PRESET_STOPS.map((stop) => (
-              <button
-                key={stop}
-                type="button"
-                className="quick-stop-button"
-                onClick={() => navigateToStop(stop)}
-              >
-                {stop}
-              </button>
-            ))}
+            <div className="quick-stops-grid">
+              {PRESET_STOPS.map((stop) => (
+                <button
+                  key={stop}
+                  type="button"
+                  className="quick-stop-button"
+                  onClick={() => navigateToStop(stop)}
+                >
+                  {stop}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+        <footer className="landing-footer">
+          <p>
+            © <span suppressHydrationWarning>{currentYear}</span> Web vytvořil <a
+            href="https://petrvurm.cz/?utm_source=bus-tabule&utm_medium=website&utm_campaign=footer_credit"
+            target="_blank"
+            rel="noreferrer"
+          >Petr Vurm</a>
+          </p>
+        </footer>
+      </div>
     </main>
   );
 }

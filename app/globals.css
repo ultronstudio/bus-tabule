@@ -30,8 +30,12 @@ a {
   padding: 24px;
 }
 
-.landing-card {
+.landing-shell {
   width: min(100%, 760px);
+}
+
+.landing-card {
+  width: 100%;
   padding: clamp(24px, 5vw, 48px);
   border: 1px solid #333;
   border-radius: 5px;
@@ -89,6 +93,29 @@ a {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
+}
+
+.landing-footer {
+  margin-top: 16px;
+  text-align: center;
+  color: #9d9d9d;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.landing-footer p {
+  margin: 0;
+}
+
+.landing-footer a {
+  display: inline-block;
+  margin-top: 4px;
+  color: #ffd400;
+  text-decoration: none;
+}
+
+.landing-footer a:hover {
+  text-decoration: underline;
 }
 
 /* LAYOUT */
