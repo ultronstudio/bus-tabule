@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 
 type Language = "cs" | "en";
-type TransportType = "vse" | "bus" | "vlak";
-type ResolvedTransportKind = Exclude<TransportType, "vse"> | "metro" | "tramvaj";
+type TransportType = "vse" | "bus" | "vlak" | "metro" | "tramvaj";
+type ResolvedTransportKind = Exclude<TransportType, "vse">;
 
 type Departure = {
   linka: string;
@@ -26,12 +26,13 @@ const translations: Record<
     labels: {
       loading: string;
       noDepartures: string;
-      bus: string;
+      line: string;
       direction: string;
       platform: string;
       departure: string;
       delay: string;
     };
+    types: Record<ResolvedTransportKind, string>;
   }
 > = {
   cs: {
@@ -39,11 +40,17 @@ const translations: Record<
     labels: {
       loading: "Načítám data…",
       noDepartures: "Žádné spoje k dispozici",
-      bus: "LINKA",
+      line: "LINKA",
       direction: "SMĚR",
       platform: "NÁST.",
       departure: "ODJEZD",
       delay: "ZPOŽD.",
+    },
+    types: {
+      bus: "BUS",
+      vlak: "VLAK",
+      metro: "METRO",
+      tramvaj: "TRAMVAJ",
     },
   },
   en: {
@@ -51,11 +58,17 @@ const translations: Record<
     labels: {
       loading: "Loading data…",
       noDepartures: "No departures available",
-      bus: "LINE NO.",
+      line: "LINE",
       direction: "DIRECTION",
       platform: "PLATF.",
       departure: "DEPARTURE",
       delay: "DELAY",
+    },
+    types: {
+      bus: "BUS",
+      vlak: "TRAIN",
+      metro: "METRO",
+      tramvaj: "TRAM",
     },
   },
 };
@@ -71,6 +84,16 @@ export default function BoardPage() {
 
   const activeTranslation = translations[language];
 
+  const isTransportType = (value: string | null | undefined): value is TransportType => {
+    return (
+      value === "vse" ||
+      value === "bus" ||
+      value === "vlak" ||
+      value === "metro" ||
+      value === "tramvaj"
+    );
+  };
+
   const formatLineNumber = (line: string) => {
     if (!line) return "–";
 
@@ -79,19 +102,13 @@ export default function BoardPage() {
     return prefix.slice(-3);
   };
 
-  const getColumnTitle = () => {
-    if (transportType === "vlak") return "VLAK";
-
-    return "BUS";
-  };
-
   const getLineTypeLabel = (departure: Departure) => {
     if (transportType !== "vse") return null;
 
-    if (departure.dopravniTyp === "bus") return "BUS";
-    if (departure.dopravniTyp === "vlak") return "VLAK";
-    if (departure.dopravniTyp === "metro") return "METRO";
-    if (departure.dopravniTyp === "tramvaj") return "TRAMVAJ";
+    if (departure.dopravniTyp === "bus") return getLocalizedLineType("bus");
+    if (departure.dopravniTyp === "vlak") return getLocalizedLineType("vlak");
+    if (departure.dopravniTyp === "metro") return getLocalizedLineType("metro");
+    if (departure.dopravniTyp === "tramvaj") return getLocalizedLineType("tramvaj");
 
     return null;
   };
@@ -113,7 +130,10 @@ export default function BoardPage() {
   };
 
   const formatDepartureTime = (departure: Departure) => {
-    if (!(departure.timeObj instanceof Date) || Number.isNaN(departure.timeObj.getTime())) {
+    if (
+      !(departure.timeObj instanceof Date) ||
+      Number.isNaN(departure.timeObj.getTime())
+    ) {
       return departure.cas;
     }
 
@@ -121,6 +141,17 @@ export default function BoardPage() {
       hour: "2-digit",
       minute: "2-digit",
     }).format(departure.timeObj);
+  };
+
+  const getLocalizedLineType = (dopravniTyp: string | undefined) => {
+    if (!dopravniTyp) return null;
+
+    if (dopravniTyp === "bus") return activeTranslation.types.bus;
+    if (dopravniTyp === "vlak") return activeTranslation.types.vlak;
+    if (dopravniTyp === "metro") return activeTranslation.types.metro;
+    if (dopravniTyp === "tramvaj") return activeTranslation.types.tramvaj;
+
+    return null;
   };
 
   const fetchDepartures = async () => {
@@ -139,7 +170,7 @@ export default function BoardPage() {
 
         if (s) out.set("stanice", s);
         if (f) out.set("fc", f);
-        if (typ === "bus" || typ === "vlak" || typ === "vse") {
+        if (isTransportType(typ)) {
           out.set("typ", typ);
         }
 
@@ -155,11 +186,7 @@ export default function BoardPage() {
         setStation(json.stanice);
       }
 
-      setTransportType(
-        json.typ === "bus" || json.typ === "vlak" || json.typ === "vse"
-          ? json.typ
-          : "vse"
-      );
+      setTransportType(isTransportType(json.typ) ? json.typ : "vse");
 
       const now = new Date();
 
@@ -185,13 +212,11 @@ export default function BoardPage() {
             timeObj: depTime,
             nastupiste: d.nastupiste,
             zpozdeni: d.zpozdeni ?? 0,
-            dopravniTyp:
-              d.dopravniTyp === "bus" ||
-              d.dopravniTyp === "vlak" ||
-              d.dopravniTyp === "metro" ||
-              d.dopravniTyp === "tramvaj"
-                ? d.dopravniTyp
-                : undefined,
+            dopravniTyp: isTransportType(d.dopravniTyp)
+              ? d.dopravniTyp === "vse"
+                ? undefined
+                : d.dopravniTyp
+              : undefined,
           };
         })
         .sort((a: any, b: any) => a.timeObj - b.timeObj)
@@ -213,7 +238,9 @@ export default function BoardPage() {
       setNow(new Date());
     }, 1000);
     const languageRotation = setInterval(() => {
-      setLanguage((currentLanguage) => (currentLanguage === "cs" ? "en" : "cs"));
+      setLanguage((currentLanguage) =>
+        currentLanguage === "cs" ? "en" : "cs",
+      );
     }, LANGUAGE_ROTATION_MS);
 
     return () => {
@@ -230,21 +257,29 @@ export default function BoardPage() {
 
         <div className="clock-wrapper">
           {loading && <div className="spinner small"></div>}
-          <div className="clock-date">{mounted && now ? formatCurrentDate(now) : ""}</div>
-          <div className="clock">{mounted && now ? formatCurrentTime(now) : ""}</div>
+          <div className="clock-date">
+            {mounted && now ? formatCurrentDate(now) : ""}
+          </div>
+          <div className="clock">
+            {mounted && now ? formatCurrentTime(now) : ""}
+          </div>
         </div>
       </header>
 
       {loading && departures.length === 0 ? (
-        <div className="initial-loading">{activeTranslation.labels.loading}</div>
+        <div className="initial-loading">
+          {activeTranslation.labels.loading}
+        </div>
       ) : departures.length === 0 ? (
-        <div className="initial-loading">{activeTranslation.labels.noDepartures}</div>
+        <div className="initial-loading">
+          {activeTranslation.labels.noDepartures}
+        </div>
       ) : (
         <div className="table-wrapper">
           <table className="board-table">
             <thead>
               <tr>
-                <th>{getColumnTitle()}</th>
+                <th>{activeTranslation.labels.line}</th>
                 <th>{activeTranslation.labels.direction}</th>
                 <th>{activeTranslation.labels.platform}</th>
                 <th>{activeTranslation.labels.departure}</th>

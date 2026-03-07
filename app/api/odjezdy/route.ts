@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import * as cheerio from "cheerio";
 
-type TransportType = "vse" | "bus" | "vlak";
-type ResolvedTransportKind = Exclude<TransportType, "vse"> | "metro" | "tramvaj";
+type TransportType = "vse" | "bus" | "vlak" | "metro" | "tramvaj";
+type ResolvedTransportKind = Exclude<TransportType, "vse">;
 
 type IdosRecord = {
   sOwner?: string;
@@ -56,12 +56,24 @@ function inferTransportKind(rec: IdosRecord): ResolvedTransportKind | null {
   return null;
 }
 
+function isTransportType(value: string | null): value is TransportType {
+  return (
+    value === "vse" ||
+    value === "bus" ||
+    value === "vlak" ||
+    value === "metro" ||
+    value === "tramvaj"
+  );
+}
+
 function getIdosBaseUrl(typ: TransportType) {
   switch (typ) {
     case "bus":
       return "https://idos.cz/autobusy/odjezdy/vysledky/";
     case "vlak":
       return "https://idos.cz/vlaky/odjezdy/vysledky/";
+    case "metro":
+    case "tramvaj":
     default:
       return "https://idos.cz/vlakyautobusymhdvse/odjezdy/vysledky/";
   }
@@ -189,7 +201,10 @@ export async function GET(request: Request) {
 
     const stanice = searchParams.get("stanice");
     const fc = searchParams.get("fc");
-    const typ = (searchParams.get("typ") || "vse") as TransportType;
+    const requestedType = searchParams.get("typ");
+    const typ: TransportType = isTransportType(requestedType)
+      ? requestedType
+      : "vse";
 
     if (!stanice) {
       return NextResponse.json(
@@ -242,7 +257,13 @@ export async function GET(request: Request) {
       }
     }
 
-    let odjezdy: any[] = filtered.sort((a, b) => a.date - b.date);
+    let odjezdy: any[] = filtered;
+
+    if (typ !== "vse") {
+      odjezdy = odjezdy.filter((item) => item.dopravniTyp === typ);
+    }
+
+    odjezdy = odjezdy.sort((a, b) => a.date - b.date);
 
     odjezdy.sort((a, b) => a.cas.localeCompare(b.cas));
 
