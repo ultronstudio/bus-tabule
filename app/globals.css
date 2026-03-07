@@ -10,6 +10,8 @@ margin:0;
 padding:0;
 }
 
+/* LAYOUT */
+
 .board{
 min-height:100vh;
 display:flex;
@@ -26,19 +28,8 @@ justify-content:space-between;
 align-items:center;
 border-bottom:4px solid #FFD400;
 padding-bottom:10px;
-flex-wrap:wrap;
 gap:10px;
-}
-
-.count {
-  font-size: clamp(14px, 3vw, 24px);
-  color: #ccc;
-  margin-left: 10px;
-}
-
-.subtitle {
-  font-size: clamp(14px, 3vw, 24px);
-  color: #bbb;
+flex-wrap:wrap;
 }
 
 h1{
@@ -54,31 +45,36 @@ font-size:clamp(22px,4vw,48px);
 font-weight:700;
 }
 
+.clock-wrapper{
+display:flex;
+align-items:center;
+gap:10px;
+}
+
 /* TABULKA */
 
-.table{
+.table-wrapper{
 flex:1;
-display:flex;
-flex-direction:column;
-gap:12px;
 overflow:auto;
-padding-right:10px;
 }
 
-.row{
-display:grid;
-grid-template-columns:120px 1fr 100px 140px;
-gap:10px;
-align-items:center;
+.board-table{
+width:100%;
+border-collapse:collapse;
 font-size:clamp(18px,3.5vw,56px);
-min-height:60px;
 }
 
-.head{
+.board-table thead th{
 font-size:clamp(12px,2vw,26px);
 color:#aaa;
-border-bottom:1px solid #333;
-padding-bottom:6px;
+border-bottom:2px solid #333;
+text-align:left;
+padding:10px 8px;
+}
+
+.board-table tbody td{
+padding:12px 8px;
+border-bottom:1px solid #222;
 }
 
 /* DATA */
@@ -90,14 +86,17 @@ white-space:nowrap;
 }
 
 .dir{
+max-width:0;
+width:100%;
 overflow:hidden;
-text-overflow:ellipsis;
 white-space:nowrap;
+text-overflow:ellipsis;
 }
 
 .plat{
 text-align:center;
 font-weight:600;
+white-space:nowrap;
 }
 
 .time{
@@ -106,35 +105,7 @@ font-weight:700;
 white-space:nowrap;
 }
 
-/* search bar (station selector) */
-
-.search-bar {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.search-bar input {
-  background: #111;
-  border: 1px solid #555;
-  color: white;
-  padding: 6px 8px;
-  border-radius: 4px;
-  font-size: clamp(14px, 2vw, 20px);
-}
-
-.search-bar button {
-  background: #FFD400;
-  color: black;
-  border: none;
-  padding: 6px 12px;
-  font-size: clamp(14px, 2vw, 20px);
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-/* QR PANEL */
+/* QR */
 
 .qr-box{
 position:fixed;
@@ -148,16 +119,45 @@ border-radius:8px;
 
 .qr{
 width:120px;
-height:auto;
-display:block;
+}
+
+/* LOADING */
+
+.initial-loading{
+flex:1;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:clamp(24px,5vw,48px);
+color:#aaa;
+}
+
+/* SPINNER */
+
+.spinner{
+border:4px solid rgba(255,255,255,0.2);
+border-top:4px solid #FFD400;
+border-radius:50%;
+width:60px;
+height:60px;
+animation:spin 1s linear infinite;
+}
+
+.spinner.small{
+width:20px;
+height:20px;
+border-width:3px;
+}
+
+@keyframes spin{
+to{transform:rotate(360deg)}
 }
 
 /* MOBIL */
 
 @media (max-width:900px){
 
-.row{
-grid-template-columns:80px 1fr 60px 90px;
+.board-table{
 font-size:clamp(16px,4vw,24px);
 }
 
@@ -169,93 +169,8 @@ font-size:clamp(16px,4vw,24px);
 padding:12px;
 }
 
-.header{
-flex-direction:column;
-align-items:flex-start;
-}
-
-.row{
-grid-template-columns:60px 1fr 50px 70px;
-gap:6px;
-}
-
-.qr-box{
-right:10px;
-bottom:10px;
-}
-
 .qr{
 width:80px;
 }
 
-}
-
-/* EXTRA SMALL */
-
-@media (max-width:400px){
-
-.row{
-grid-template-columns:50px 1fr 40px 60px;
-font-size:16px;
-}
-
-}
-/* LOADING OVERLAY (kept for fallback, but not used in current UI) */
-.loading-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.85);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-/* small spinner variant used in header */
-.clock-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.spinner.small {
-  width: 20px;
-  height: 20px;
-  border-width: 3px;
-}
-
-/* message shown before any departures are available */
-.initial-loading {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: clamp(24px, 5vw, 48px);
-  color: #aaa;
-}
-
-.loading-content {
-  text-align: center;
-  color: white;
-}
-
-.loading-text {
-  margin-top: 16px;
-  font-size: clamp(18px, 3vw, 24px);
-}
-
-.spinner {
-  border: 4px solid rgba(255,255,255,0.2);
-  border-top: 4px solid #FFD400;
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  animation: spin 1s linear infinite;
-  margin-left: 20px;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
