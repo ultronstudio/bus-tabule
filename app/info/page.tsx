@@ -76,7 +76,6 @@ export default function BoardPage() {
 
   const formatCurrentDate = (date: Date) => {
     return new Intl.DateTimeFormat(activeTranslation.locale, {
-      weekday: "long",
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
