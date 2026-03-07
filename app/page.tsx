@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 type Departure = {
   linka: string;
   kam: string;
-  datum: string;
   cas: string;
   nastupiste: string;
   zpozdeni: number;
@@ -15,6 +14,7 @@ type Departure = {
 export default function BoardPage() {
   const [departures, setDepartures] = useState<Departure[]>([]);
   const [time, setTime] = useState("");
+  const [currentDate, setCurrentDate] = useState("");
   const [loading, setLoading] = useState(true);
   const [station, setStation] = useState<string>("");
 
@@ -63,16 +63,9 @@ export default function BoardPage() {
             }
           }
 
-          const datum = depTime.toLocaleDateString("cs-CZ", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-          });
-
           return {
             linka: d.linka,
             kam: d.kam.replace(/,,/g, " "),
-            datum,
             cas,
             timeObj: depTime,
             nastupiste: d.nastupiste,
@@ -93,10 +86,22 @@ export default function BoardPage() {
 
     const interval = setInterval(fetchDepartures, 15000);
 
-    setTime(new Date().toLocaleTimeString("cs-CZ"));
+    const updateClock = () => {
+      const now = new Date();
 
+      setTime(now.toLocaleTimeString("cs-CZ"));
+      setCurrentDate(
+        now.toLocaleDateString("cs-CZ", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        }),
+      );
+    };
+
+    updateClock();
     const clock = setInterval(() => {
-      setTime(new Date().toLocaleTimeString("cs-CZ"));
+      updateClock();
     }, 1000);
 
     return () => {
@@ -112,6 +117,7 @@ export default function BoardPage() {
 
         <div className="clock-wrapper">
           {loading && <div className="spinner small"></div>}
+          <div className="clock-date">{currentDate}</div>
           <div className="clock">{time}</div>
         </div>
       </header>
@@ -142,7 +148,7 @@ export default function BoardPage() {
 
                   <td className="plat">{d.nastupiste}</td>
 
-                  <td className="time">{d.datum} {d.cas}</td>
+                  <td className="time">{d.cas}</td>
 
                   <td className={`delay ${d.zpozdeni > 5 ? "big" : ""}`}>
                     {d.zpozdeni > 0 ? `+${d.zpozdeni}` : ""}
