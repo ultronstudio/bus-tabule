@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 type Departure = {
   linka: string;
   kam: string;
+  datum: string;
   cas: string;
   nastupiste: string;
   zpozdeni: number;
@@ -50,19 +51,28 @@ export default function BoardPage() {
       const parsed = json.data
         .map((d: any) => {
           const cas = d.cas.split("\n")[0].trim();
+          const depTime = d.date ? new Date(d.date) : new Date();
 
-          const [h, m] = cas.split(":").map(Number);
+          if (!d.date) {
+            const [h, m] = cas.split(":").map(Number);
 
-          const depTime = new Date();
-          depTime.setHours(h, m, 0, 0);
+            depTime.setHours(h, m, 0, 0);
 
-          if (depTime < now) {
-            depTime.setDate(depTime.getDate() + 1);
+            if (depTime < now) {
+              depTime.setDate(depTime.getDate() + 1);
+            }
           }
+
+          const datum = depTime.toLocaleDateString("cs-CZ", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          });
 
           return {
             linka: d.linka,
             kam: d.kam.replace(/,,/g, " "),
+            datum,
             cas,
             timeObj: depTime,
             nastupiste: d.nastupiste,
@@ -132,7 +142,7 @@ export default function BoardPage() {
 
                   <td className="plat">{d.nastupiste}</td>
 
-                  <td className="time">{d.cas}</td>
+                  <td className="time">{d.datum} {d.cas}</td>
 
                   <td className={`delay ${d.zpozdeni > 5 ? "big" : ""}`}>
                     {d.zpozdeni > 0 ? `+${d.zpozdeni}` : ""}
