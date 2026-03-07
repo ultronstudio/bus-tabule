@@ -48,7 +48,11 @@ async function parseIntercityFromHtml(html: string) {
           ? rec.dtDateTime.split("T")[1].substr(0, 5)
           : "";
         const nastupiste = rec.sStand || "-";
-        const zpozdeni = parseInt(rec.sDelay || "0");
+        const rawDelay =
+          typeof rec.iDelay === "number"
+            ? rec.iDelay
+            : Number.parseInt(rec.sDelay || "0", 10);
+        const zpozdeni = Number.isFinite(rawDelay) && rawDelay > 0 ? rawDelay : 0;
         const date = rec.dtDateTime ? new Date(rec.dtDateTime) : null;
         if (cas && kam && date) {
           results.push({
