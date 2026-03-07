@@ -59,10 +59,11 @@ const translations: Record<
 
 export default function BoardPage() {
   const [departures, setDepartures] = useState<Departure[]>([]);
-  const [now, setNow] = useState(() => new Date());
+  const [now, setNow] = useState<Date | null>(null);
   const [loading, setLoading] = useState(true);
   const [station, setStation] = useState<string>("");
   const [language, setLanguage] = useState<Language>("cs");
+  const [mounted, setMounted] = useState(false);
 
   const activeTranslation = translations[language];
 
@@ -165,6 +166,8 @@ export default function BoardPage() {
   };
 
   useEffect(() => {
+    setMounted(true);
+    setNow(new Date());
     fetchDepartures();
 
     const interval = setInterval(fetchDepartures, 15000);
@@ -189,8 +192,8 @@ export default function BoardPage() {
 
         <div className="clock-wrapper">
           {loading && <div className="spinner small"></div>}
-          <div className="clock-date">{formatCurrentDate(now)}</div>
-          <div className="clock">{formatCurrentTime(now)}</div>
+          <div className="clock-date">{mounted && now ? formatCurrentDate(now) : ""}</div>
+          <div className="clock">{mounted && now ? formatCurrentTime(now) : ""}</div>
         </div>
       </header>
 
