@@ -66,6 +66,35 @@ function isTransportType(value: string | null): value is TransportType {
   );
 }
 
+function getFallbackStationName(
+  station: string,
+  typ: TransportType
+): string | null {
+  if (typ !== "metro" && typ !== "tramvaj") {
+    return null;
+  }
+
+  const normalized = station
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+
+  if (
+    normalized === "praha hl.n." ||
+    normalized === "praha hl n" ||
+    normalized === "praha, hl.n." ||
+    normalized === "praha, hl n" ||
+    normalized === "praha hlavni nadrazi" ||
+    normalized === "praha, hlavni nadrazi"
+  ) {
+    return "Hlavní nádraží";
+  }
+
+  return null;
+}
+
 function getIdosBaseUrl(typ: TransportType) {
   switch (typ) {
     case "bus":
@@ -195,6 +224,55 @@ async function fetchPage(
   return await response.text();
 }
 
+async function fetchDeparturesForStation(
+  baseUrl: string,
+  stanice: string,
+  fc?: string
+) {
+  const now = new Date();
+  const allCandidates: any[] = [];
+
+  let html = await fetchPage(baseUrl, stanice, fc || undefined);
+  allCandidates.push(...(await parseIntercityFromHtml(html)));
+
+  for (let h = 1; h <= 24; h++) {
+    try {
+      const candidate = new Date(now.getTime() + h * 3600000);
+
+      const hh =
+        String(candidate.getHours()).padStart(2, "0") +
+        ":" +
+        String(candidate.getMinutes()).padStart(2, "0");
+
+      html = await fetchPage(baseUrl, stanice, fc || undefined, hh);
+
+      const list = await parseIntercityFromHtml(html);
+
+      if (list.length > 0) {
+        allCandidates.push(...list);
+      }
+    } catch (e) {
+      console.error("sampling error", e);
+    }
+  }
+
+  const seen = new Set<string>();
+  const filtered: any[] = [];
+
+  for (const rec of allCandidates) {
+    if (rec.date && rec.date >= now) {
+      const key = `${rec.linka}|${rec.cas}|${rec.kam}|${rec.nastupiste}`;
+
+      if (!seen.has(key)) {
+        seen.add(key);
+        filtered.push(rec);
+      }
+    }
+  }
+
+  return filtered;
+}
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -215,52 +293,26 @@ export async function GET(request: Request) {
 
     const baseUrl = getIdosBaseUrl(typ);
 
-    const now = new Date();
-
-    let allCandidates: any[] = [];
-
-    let html = await fetchPage(baseUrl, stanice, fc || undefined);
-    allCandidates.push(...(await parseIntercityFromHtml(html)));
-
-    for (let h = 1; h <= 24; h++) {
-      try {
-        const candidate = new Date(now.getTime() + h * 3600000);
-
-        const hh =
-          String(candidate.getHours()).padStart(2, "0") +
-          ":" +
-          String(candidate.getMinutes()).padStart(2, "0");
-
-        html = await fetchPage(baseUrl, stanice, fc || undefined, hh);
-
-        const list = await parseIntercityFromHtml(html);
-
-        if (list.length > 0) {
-          allCandidates.push(...list);
-        }
-      } catch (e) {
-        console.error("sampling error", e);
-      }
-    }
-
-    const seen = new Set<string>();
-    const filtered: any[] = [];
-
-    for (const rec of allCandidates) {
-      if (rec.date && rec.date >= now) {
-        const key = `${rec.linka}|${rec.cas}|${rec.kam}|${rec.nastupiste}`;
-
-        if (!seen.has(key)) {
-          seen.add(key);
-          filtered.push(rec);
-        }
-      }
-    }
-
-    let odjezdy: any[] = filtered;
+    let odjezdy: any[] = await fetchDeparturesForStation(
+      baseUrl,
+      stanice,
+      fc || undefined
+    );
 
     if (typ !== "vse") {
       odjezdy = odjezdy.filter((item) => item.dopravniTyp === typ);
+    }
+
+    if (odjezdy.length === 0) {
+      const fallbackStation = getFallbackStationName(stanice, typ);
+
+      if (fallbackStation) {
+        odjezdy = await fetchDeparturesForStation(baseUrl, fallbackStation);
+
+        if (typ !== "vse") {
+          odjezdy = odjezdy.filter((item) => item.dopravniTyp === typ);
+        }
+      }
     }
 
     odjezdy = odjezdy.sort((a, b) => a.date - b.date);
