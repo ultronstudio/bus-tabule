@@ -25,7 +25,7 @@ export default function BoardPage() {
 
       if (typeof window !== "undefined") {
         const params = new URLSearchParams(window.location.search);
-        const s = params.get("stanice");
+        const s = params.get("stanice") || "Nový Bydžov, Terminál HD";
         const f = params.get("fc");
 
         const out = new URLSearchParams();
@@ -66,7 +66,7 @@ export default function BoardPage() {
             cas,
             timeObj: depTime,
             nastupiste: d.nastupiste,
-            zpozdeni: parseInt(d.zpozdeni) || 0,
+            zpozdeni: d.zpozdeni ?? 0,
           };
         })
         .sort((a: any, b: any) => a.timeObj - b.timeObj)
@@ -132,6 +132,10 @@ export default function BoardPage() {
                   <td className="plat">{d.nastupiste}</td>
 
                   <td className="time">{d.cas}</td>
+
+                  <td className={`delay ${d.zpozdeni > 5 ? "big" : ""}`}>
+                    {d.zpozdeni > 0 ? `+${d.zpozdeni}` : ""}
+                  </td>
                 </tr>
               ))}
             </tbody>

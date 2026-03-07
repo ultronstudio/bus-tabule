@@ -1,156 +1,165 @@
-*{
-box-sizing:border-box;
+* {
+  box-sizing: border-box;
 }
 
-body{
-background:black;
-color:white;
-font-family:system-ui;
-margin:0;
-padding:0;
+body {
+  background: black;
+  color: white;
+  font-family: system-ui;
+  margin: 0;
+  padding: 0;
 }
 
 /* LAYOUT */
 
-.board{
-min-height:100vh;
-display:flex;
-flex-direction:column;
-padding:clamp(10px,3vw,40px);
-gap:20px;
+.board {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(10px, 3vw, 40px);
+  gap: 20px;
 }
 
 /* HEADER */
 
-.header{
-display:flex;
-justify-content:space-between;
-align-items:center;
-border-bottom:4px solid #FFD400;
-padding-bottom:10px;
-gap:10px;
-flex-wrap:wrap;
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 4px solid #ffd400;
+  padding-bottom: 10px;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-h1{
-font-size:clamp(28px,5vw,64px);
-margin:0;
-color:#FFD400;
-font-weight:700;
-letter-spacing:1px;
+h1 {
+  font-size: clamp(28px, 5vw, 64px);
+  margin: 0;
+  color: #ffd400;
+  font-weight: 700;
+  letter-spacing: 1px;
 }
 
-.clock{
-font-size:clamp(22px,4vw,48px);
-font-weight:700;
+.clock {
+  font-size: clamp(22px, 4vw, 48px);
+  font-weight: 700;
 }
 
-.clock-wrapper{
-display:flex;
-align-items:center;
-gap:10px;
+.clock-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 /* TABULKA */
 
-.table-wrapper{
-flex:1;
-overflow:auto;
+.table-wrapper {
+  flex: 1;
+  overflow: auto;
 }
 
-.board-table{
-width:100%;
-border-collapse:collapse;
-font-size:clamp(18px,3.5vw,56px);
+.board-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: clamp(18px, 3.5vw, 56px);
 }
 
-.board-table thead th{
-font-size:clamp(12px,2vw,26px);
-color:#aaa;
-border-bottom:2px solid #333;
-text-align:left;
-padding:10px 8px;
+.board-table thead th {
+  font-size: clamp(12px, 2vw, 26px);
+  color: #aaa;
+  border-bottom: 2px solid #333;
+  text-align: left;
+  padding: 10px 8px;
 }
 
-.board-table tbody td{
-padding:12px 8px;
-border-bottom:1px solid #222;
+.board-table tbody td {
+  padding: 12px 8px;
+  border-bottom: 1px solid #222;
 }
 
 /* DATA */
 
-.line{
-color:#FFD400;
-font-weight:700;
-white-space:nowrap;
+.line {
+  color: #ffd400;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
-.dir{
-max-width:0;
-width:100%;
-overflow:hidden;
-white-space:nowrap;
-text-overflow:ellipsis;
+.dir {
+  max-width: 0;
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-.plat{
-text-align:center;
-font-weight:600;
-white-space:nowrap;
+.plat {
+  text-align: center;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
-.time{
-text-align:right;
-font-weight:700;
-white-space:nowrap;
+.time {
+  text-align: right;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 /* LOADING */
 
-.initial-loading{
-flex:1;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:clamp(24px,5vw,48px);
-color:#aaa;
+.initial-loading {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(24px, 5vw, 48px);
+  color: #aaa;
 }
 
 /* SPINNER */
 
-.spinner{
-border:4px solid rgba(255,255,255,0.2);
-border-top:4px solid #FFD400;
-border-radius:50%;
-width:60px;
-height:60px;
-animation:spin 1s linear infinite;
+.spinner {
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  border-top: 4px solid #ffd400;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
 }
 
-.spinner.small{
-width:20px;
-height:20px;
-border-width:3px;
+.spinner.small {
+  width: 20px;
+  height: 20px;
+  border-width: 3px;
 }
 
-@keyframes spin{
-to{transform:rotate(360deg)}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* MOBIL */
 
-@media (max-width:900px){
-
-.board-table{
-font-size:clamp(16px,4vw,24px);
+@media (max-width: 900px) {
+  .board-table {
+    font-size: clamp(16px, 4vw, 24px);
+  }
 }
 
+@media (max-width: 600px) {
+  .board {
+    padding: 12px;
+  }
 }
 
-@media (max-width:600px){
-
-.board{
-padding:12px;
+.delay {
+  text-align: right;
+  font-weight: 700;
+  color: #ffd400;
+  white-space: nowrap;
 }
 
+.delay.big {
+  color: #ff4444;
 }
