@@ -22,14 +22,6 @@ export default function BoardPage() {
 
     try {
       let url = "/api/odjezdy";
-
-      if (typeof window !== "undefined") {
-        const params = new URLSearchParams(window.location.search);
-        const s = params.get("stanice");
-        const f = params.get("fc");
-
-        const out = new URLSearchParams();
-
         if (s) out.set("stanice", s);
         if (f) out.set("fc", f);
 
@@ -146,10 +138,6 @@ export default function BoardPage() {
           </table>
         </div>
       )}
-
-      <div className="qr-box">
-        <img className="qr" src={qrUrl} alt="QR kód pro mobilní verzi" />
-      </div>
     </main>
   );
 }
