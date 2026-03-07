@@ -18,6 +18,14 @@ export default function BoardPage() {
   const [loading, setLoading] = useState(true);
   const [station, setStation] = useState<string>("");
 
+  const formatLineNumber = (line: string) => {
+    if (!line) return "–";
+
+    const [prefix] = line.split("/");
+
+    return prefix.slice(-3);
+  };
+
   const fetchDepartures = async () => {
     setLoading(true);
 
@@ -131,7 +139,7 @@ export default function BoardPage() {
           <table className="board-table">
             <thead>
               <tr>
-                <th>LINKA</th>
+                <th>BUS</th>
                 <th>SMĚR</th>
                 <th>NÁST.</th>
                 <th>ODJEZD</th>
@@ -142,7 +150,7 @@ export default function BoardPage() {
             <tbody>
               {departures.map((d, i) => (
                 <tr key={i}>
-                  <td className="line">{d.linka || d.carrier || "–"}</td>
+                  <td className="line">{formatLineNumber(d.linka || d.carrier || "")}</td>
 
                   <td className="dir">{d.kam}</td>
 
