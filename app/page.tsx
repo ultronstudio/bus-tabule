@@ -3,11 +3,11 @@
 import { useRouter } from "next/navigation";
 
 const PRESET_STOPS = [
-  "Nový Bydžov, Terminál HD",
   "Hradec Králové, Terminál HD",
-  "Chlumec n.C., aut.st.",
-  "Jičín, aut.nádr.",
-  "Praha, Florenc, aut.nádr.",
+  "Nový Bydžov, Terminál HD",
+  "Chlumec nad Cidlinou, nám.",
+  "Jičín, aut.st.",
+  "Praha, Florenc",
 ];
 
 export default function HomePage() {
@@ -29,7 +29,8 @@ export default function HomePage() {
           <p className="landing-kicker">Odjezdová tabule</p>
           <h1>Vyberte zastávku</h1>
           <p className="landing-description">
-            Vyberte jednu z připravených zastávek a pokračujte na informační tabuli.
+            Vyberte jednu z připravených zastávek a pokračujte na informační
+            tabuli.
           </p>
 
           <div className="quick-stops">
@@ -52,11 +53,15 @@ export default function HomePage() {
 
         <footer className="landing-footer">
           <p>
-            © Web v roce <span suppressHydrationWarning>{currentYear}</span> vytvořil <a
-            href="https://petrvurm.cz/?utm_source=bus-tabule&utm_medium=website&utm_campaign=footer_credit"
-            target="_blank"
-            rel="noreferrer"
-          >Petr Vurm</a>
+            © Web v roce <span suppressHydrationWarning>{currentYear}</span>{" "}
+            vytvořil{" "}
+            <a
+              href="https://petrvurm.cz/?utm_source=bus-tabule&utm_medium=website&utm_campaign=footer_credit"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Petr Vurm
+            </a>
           </p>
         </footer>
       </div>
