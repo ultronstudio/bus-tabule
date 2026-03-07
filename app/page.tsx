@@ -52,7 +52,7 @@ export default function HomePage() {
 
         <footer className="landing-footer">
           <p>
-            © <span suppressHydrationWarning>{currentYear}</span> Web vytvořil <a
+            © Web v roce <span suppressHydrationWarning>{currentYear}</span> vytvořil <a
             href="https://petrvurm.cz/?utm_source=bus-tabule&utm_medium=website&utm_campaign=footer_credit"
             target="_blank"
             rel="noreferrer"
