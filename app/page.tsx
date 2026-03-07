@@ -119,6 +119,7 @@ export default function BoardPage() {
                 <th>SMĚR</th>
                 <th>NÁST.</th>
                 <th>ODJEZD</th>
+                <th>ZPOŽD.</th>
               </tr>
             </thead>
 
