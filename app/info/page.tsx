@@ -26,7 +26,7 @@ export default function BoardPage() {
 
       if (typeof window !== "undefined") {
         const params = new URLSearchParams(window.location.search);
-        const s = params.get("stanice") || "Nový Bydžov, Terminál HD";
+        const s = params.get("stanice") || "Nechanice náměstí";
         const f = params.get("fc");
 
         const out = new URLSearchParams();
