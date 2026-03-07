@@ -106,7 +106,7 @@ export default function BoardPage() {
   return (
     <main className="board">
       <header className="header">
-        <h1>{station || "Odjezdy"}</h1>
+        <h1>{station || "Načítám data…"}</h1>
 
         <div className="clock-wrapper">
           {loading && <div className="spinner small"></div>}
