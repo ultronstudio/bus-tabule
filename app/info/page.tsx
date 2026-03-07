@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 type Language = "cs" | "en";
 type TransportType = "vse" | "bus" | "vlak";
-type ResolvedTransportKind = Exclude<TransportType, "vse">;
+type ResolvedTransportKind = Exclude<TransportType, "vse"> | "metro" | "tramvaj";
 
 type Departure = {
   linka: string;
@@ -39,7 +39,7 @@ const translations: Record<
     labels: {
       loading: "Načítám data…",
       noDepartures: "Žádné spoje k dispozici",
-      bus: "BUS",
+      bus: "LINKA",
       direction: "SMĚR",
       platform: "NÁST.",
       departure: "ODJEZD",
@@ -51,7 +51,7 @@ const translations: Record<
     labels: {
       loading: "Loading data…",
       noDepartures: "No departures available",
-      bus: "BUS",
+      bus: "LINE NO.",
       direction: "DIRECTION",
       platform: "PLATF.",
       departure: "DEPARTURE",
@@ -90,6 +90,8 @@ export default function BoardPage() {
 
     if (departure.dopravniTyp === "bus") return "BUS";
     if (departure.dopravniTyp === "vlak") return "VLAK";
+    if (departure.dopravniTyp === "metro") return "METRO";
+    if (departure.dopravniTyp === "tramvaj") return "TRAMVAJ";
 
     return null;
   };
@@ -184,7 +186,10 @@ export default function BoardPage() {
             nastupiste: d.nastupiste,
             zpozdeni: d.zpozdeni ?? 0,
             dopravniTyp:
-              d.dopravniTyp === "bus" || d.dopravniTyp === "vlak"
+              d.dopravniTyp === "bus" ||
+              d.dopravniTyp === "vlak" ||
+              d.dopravniTyp === "metro" ||
+              d.dopravniTyp === "tramvaj"
                 ? d.dopravniTyp
                 : undefined,
           };
@@ -248,29 +253,33 @@ export default function BoardPage() {
             </thead>
 
             <tbody>
-              {departures.map((d, i) => (
-                <tr key={i}>
-                  <td className="line line-cell">
-                    <span className="line-value">
-                      {formatLineNumber(d.linka || d.carrier || "")}
-                    </span>
+              {departures.map((d, i) => {
+                const lineTypeLabel = getLineTypeLabel(d);
 
-                    {getLineTypeLabel(d) ? (
-                      <span className="line-type">{getLineTypeLabel(d)}</span>
-                    ) : null}
-                  </td>
+                return (
+                  <tr key={i}>
+                    <td className="line line-cell">
+                      <span className="line-value">
+                        {formatLineNumber(d.linka || d.carrier || "")}
+                      </span>
 
-                  <td className="dir">{d.kam}</td>
+                      {lineTypeLabel ? (
+                        <span className="line-type">{lineTypeLabel}</span>
+                      ) : null}
+                    </td>
 
-                  <td className="plat">{d.nastupiste}</td>
+                    <td className="dir">{d.kam}</td>
 
-                  <td className="time">{formatDepartureTime(d)}</td>
+                    <td className="plat">{d.nastupiste}</td>
 
-                  <td className={`delay ${d.zpozdeni > 5 ? "big" : ""}`}>
-                    {d.zpozdeni > 0 ? `+${d.zpozdeni}` : ""}
-                  </td>
-                </tr>
-              ))}
+                    <td className="time">{formatDepartureTime(d)}</td>
+
+                    <td className={`delay ${d.zpozdeni > 5 ? "big" : ""}`}>
+                      {d.zpozdeni > 0 ? `+${d.zpozdeni}` : ""}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

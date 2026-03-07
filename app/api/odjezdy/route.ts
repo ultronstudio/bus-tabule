@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import * as cheerio from "cheerio";
 
 type TransportType = "vse" | "bus" | "vlak";
-type ResolvedTransportKind = Exclude<TransportType, "vse">;
+type ResolvedTransportKind = Exclude<TransportType, "vse"> | "metro" | "tramvaj";
 
 type IdosRecord = {
   sOwner?: string;
@@ -28,6 +28,14 @@ function inferTransportKind(rec: IdosRecord): ResolvedTransportKind | null {
     .map((value) => value!.trim().toLowerCase());
 
   const rawTypeName = (rec.oInfo?.sTypeName || "").trim().toLowerCase();
+
+  if (rawTypes.includes("metro") || /metro/.test(rawTypeName)) {
+    return "metro";
+  }
+
+  if (rawTypes.includes("tram") || /tramvaj/.test(rawTypeName)) {
+    return "tramvaj";
+  }
 
   if (
     rawTypes.includes("bus") ||
@@ -98,8 +106,9 @@ async function parseIntercityFromHtml(html: string) {
         const dopravniTyp = inferTransportKind(rec) ?? undefined;
 
         if (
-          /Dopravní\s+podnik\s+města/i.test(carrier) ||
-          /měst/i.test(carrier)
+          (/Dopravní\s+podnik\s+města/i.test(carrier) || /měst/i.test(carrier)) &&
+          dopravniTyp !== "metro" &&
+          dopravniTyp !== "tramvaj"
         ) {
           continue;
         }
