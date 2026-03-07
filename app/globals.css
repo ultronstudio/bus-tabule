@@ -200,6 +200,24 @@ h1 {
   white-space: nowrap;
 }
 
+.line-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.line-value {
+  line-height: 1;
+}
+
+.line-type {
+  font-size: 0.42em;
+  line-height: 1;
+  color: #aaa;
+  letter-spacing: 0.08em;
+}
+
 .dir {
   max-width: 0;
   width: 100%;

@@ -2,6 +2,51 @@ import { NextResponse } from "next/server";
 import * as cheerio from "cheerio";
 
 type TransportType = "vse" | "bus" | "vlak";
+type ResolvedTransportKind = Exclude<TransportType, "vse">;
+
+type IdosRecord = {
+  sOwner?: string;
+  sNum1?: string | number;
+  sNum2?: string | number;
+  sDestination?: string;
+  dtDateTime?: string;
+  sStand?: string;
+  iDelay?: number;
+  sDelay?: string;
+  sType?: string;
+  oInfo?: {
+    sNum1?: string | number;
+    sNum2?: string | number;
+    sType?: string;
+    sTypeName?: string | null;
+  };
+};
+
+function inferTransportKind(rec: IdosRecord): ResolvedTransportKind | null {
+  const rawTypes = [rec.sType, rec.oInfo?.sType]
+    .filter(Boolean)
+    .map((value) => value!.trim().toLowerCase());
+
+  const rawTypeName = (rec.oInfo?.sTypeName || "").trim().toLowerCase();
+
+  if (
+    rawTypes.includes("bus") ||
+    /autobus/.test(rawTypeName)
+  ) {
+    return "bus";
+  }
+
+  if (
+    rawTypes.some((value) => /^(r|rx|sp|os|ex|ec|ic|sc|rj|le|en|nj|rex|s)$/.test(value)) ||
+    /(vlak|rychlík|spěšný|osobní|expres|eurocity|intercity|supercity|railjet|nightjet)/.test(
+      rawTypeName
+    )
+  ) {
+    return "vlak";
+  }
+
+  return null;
+}
 
 function getIdosBaseUrl(typ: TransportType) {
   switch (typ) {
@@ -48,8 +93,9 @@ async function parseIntercityFromHtml(html: string) {
       const data = JSON.parse(text.slice(braceStart, end));
       const records = data.departureTableInfo?.aoRecords || [];
 
-      for (const rec of records) {
+      for (const rec of records as IdosRecord[]) {
         const carrier = rec.sOwner || "";
+        const dopravniTyp = inferTransportKind(rec) ?? undefined;
 
         if (
           /Dopravní\s+podnik\s+města/i.test(carrier) ||
@@ -96,6 +142,7 @@ async function parseIntercityFromHtml(html: string) {
             nastupiste,
             zpozdeni,
             carrier,
+            dopravniTyp,
             date,
           });
         }

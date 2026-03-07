@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 
 type Language = "cs" | "en";
+type TransportType = "vse" | "bus" | "vlak";
+type ResolvedTransportKind = Exclude<TransportType, "vse">;
 
 type Departure = {
   linka: string;
@@ -12,6 +14,7 @@ type Departure = {
   nastupiste: string;
   zpozdeni: number;
   carrier?: string;
+  dopravniTyp?: ResolvedTransportKind;
 };
 
 const LANGUAGE_ROTATION_MS = 15000;
@@ -63,6 +66,7 @@ export default function BoardPage() {
   const [loading, setLoading] = useState(true);
   const [station, setStation] = useState<string>("");
   const [language, setLanguage] = useState<Language>("cs");
+  const [transportType, setTransportType] = useState<TransportType>("vse");
   const [mounted, setMounted] = useState(false);
 
   const activeTranslation = translations[language];
@@ -73,6 +77,21 @@ export default function BoardPage() {
     const [prefix] = line.split("/");
 
     return prefix.slice(-3);
+  };
+
+  const getColumnTitle = () => {
+    if (transportType === "vlak") return "VLAK";
+
+    return "BUS";
+  };
+
+  const getLineTypeLabel = (departure: Departure) => {
+    if (transportType !== "vse") return null;
+
+    if (departure.dopravniTyp === "bus") return "BUS";
+    if (departure.dopravniTyp === "vlak") return "VLAK";
+
+    return null;
   };
 
   const formatCurrentDate = (date: Date) => {
@@ -112,11 +131,15 @@ export default function BoardPage() {
         const params = new URLSearchParams(window.location.search);
         const s = params.get("stanice") || "Nový Bydžov, Terminál HD";
         const f = params.get("fc");
+        const typ = params.get("typ");
 
         const out = new URLSearchParams();
 
         if (s) out.set("stanice", s);
         if (f) out.set("fc", f);
+        if (typ === "bus" || typ === "vlak" || typ === "vse") {
+          out.set("typ", typ);
+        }
 
         if ([...out].length) {
           url += "?" + out.toString();
@@ -129,6 +152,12 @@ export default function BoardPage() {
       if (json.stanice) {
         setStation(json.stanice);
       }
+
+      setTransportType(
+        json.typ === "bus" || json.typ === "vlak" || json.typ === "vse"
+          ? json.typ
+          : "vse"
+      );
 
       const now = new Date();
 
@@ -154,6 +183,10 @@ export default function BoardPage() {
             timeObj: depTime,
             nastupiste: d.nastupiste,
             zpozdeni: d.zpozdeni ?? 0,
+            dopravniTyp:
+              d.dopravniTyp === "bus" || d.dopravniTyp === "vlak"
+                ? d.dopravniTyp
+                : undefined,
           };
         })
         .sort((a: any, b: any) => a.timeObj - b.timeObj)
@@ -206,7 +239,7 @@ export default function BoardPage() {
           <table className="board-table">
             <thead>
               <tr>
-                <th>{activeTranslation.labels.bus}</th>
+                <th>{getColumnTitle()}</th>
                 <th>{activeTranslation.labels.direction}</th>
                 <th>{activeTranslation.labels.platform}</th>
                 <th>{activeTranslation.labels.departure}</th>
@@ -217,7 +250,15 @@ export default function BoardPage() {
             <tbody>
               {departures.map((d, i) => (
                 <tr key={i}>
-                  <td className="line">{formatLineNumber(d.linka || d.carrier || "")}</td>
+                  <td className="line line-cell">
+                    <span className="line-value">
+                      {formatLineNumber(d.linka || d.carrier || "")}
+                    </span>
+
+                    {getLineTypeLabel(d) ? (
+                      <span className="line-type">{getLineTypeLabel(d)}</span>
+                    ) : null}
+                  </td>
 
                   <td className="dir">{d.kam}</td>
 
